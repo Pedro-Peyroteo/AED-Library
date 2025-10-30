@@ -1,0 +1,30 @@
+# Ignore build artifacts
+build/
+
+# Ignore object files and executables
+*.o
+*.out
+*.exe
+
+# Ignore dependency files
+*.d
+
+# Ignore editor/IDE-specific files
+*.swp
+*.swo
+*.bak
+*.tmp
+*.log
+.vscode/
+.idea/
+
+# Ignore compiled libraries
+*.a
+*.so
+*.dll
+*.lib
+
+# Ignore test coverage files
+*.gcda
+*.gcno
+*.gcov
