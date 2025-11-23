@@ -1,0 +1,2 @@
+id;user_id;book_id;date_borrow;date_return
+1;1;1;20241123;0
