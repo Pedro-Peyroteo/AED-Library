@@ -65,6 +65,11 @@ Book *db_find_book_by_id(const DB *db, unsigned id);
 User *db_find_user_by_id(const DB *db, unsigned id);
 Loan *db_find_loan_by_id(const DB *db, unsigned id);
 
+/* Give read-only access to the internal lists (for iteration). */
+DList *db_get_books(const DB *db);
+DList *db_get_users(const DB *db);
+DList *db_get_loans(const DB *db);
+
 /*
 	Basic CRUD helpers.
 

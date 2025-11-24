@@ -135,3 +135,10 @@ test-db: src/tests/test_db.c \
 		-o $(BUILDDIR)/test_db
 	@echo "Running db layer integration test..."
 	$(BUILDDIR)/test_db.exe
+
+# =====================================================
+#   RUN MAIN APPLICATION
+# =====================================================
+run: all
+	@echo "Running main application..."
+	$(TARGET).exe

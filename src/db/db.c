@@ -153,6 +153,23 @@ Loan *db_find_loan_by_id(const DB *db, unsigned id)
 	return NULL;
 }
 
+/* Simple accessors so UI code can iterate over lists. */
+
+DList *db_get_books(const DB *db)
+{
+	return db ? db->books : NULL;
+}
+
+DList *db_get_users(const DB *db)
+{
+	return db ? db->users : NULL;
+}
+
+DList *db_get_loans(const DB *db)
+{
+	return db ? db->loans : NULL;
+}
+
 /*
 	CRUD - Create helpers.
 

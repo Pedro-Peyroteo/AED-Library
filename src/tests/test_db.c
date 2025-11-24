@@ -7,7 +7,7 @@
 #include "model/loans.h"
 
 /* Simple DB integration test.
-   - loads existing data from data/*.txt through fs+db
+   - loads existing data from data/x.txt through fs+db
    - does a few CRUD operations
    - saves back to disk
 */

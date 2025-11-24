@@ -1,5 +1,6 @@
-# Ignore build artifacts
+# Ignore build and data artifacts
 build/
+dat/
 
 # Ignore object files and executables
 *.o

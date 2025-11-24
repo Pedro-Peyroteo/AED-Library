@@ -1,2 +1,0 @@
-id;name;email
-1;Test User;user@example.com

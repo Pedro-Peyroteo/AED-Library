@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "app.h"
+#include "app/app.h"
 
 int main(void) {
     printf("A iniciar o sistema...\n");
