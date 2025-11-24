@@ -74,7 +74,7 @@ clean:
 # =====================================================
 #   PHONY
 # =====================================================
-.PHONY: all clean test-dlist
+.PHONY: all clean test-dlist test-fs test-db
 
 # =====================================================
 #   TEST: FS LAYER
@@ -104,3 +104,34 @@ test-fs: src/tests/test_fs.c \
 		-o $(BUILDDIR)/test_fs
 	@echo "Running fs layer test..."
 	$(BUILDDIR)/test_fs.exe
+
+# =====================================================
+#   TEST: DB LAYER (integrated with FS)
+# =====================================================
+test-db: src/tests/test_db.c \
+	src/db/db.c \
+	src/fs/books_file.c \
+	src/fs/users_file.c \
+	src/fs/loans_file.c \
+	src/lib/dlist/dlist.c \
+	src/lib/dlist/dlist_priority.c \
+	src/lib/cutils/cutils.c \
+	src/model/book.c \
+	src/model/user.c \
+	src/model/loan.c
+	@if not exist "$(BUILDDIR)" mkdir "$(BUILDDIR)"
+	$(CC) $(CFLAGS) \
+		src/tests/test_db.c \
+		src/db/db.c \
+		src/fs/books_file.c \
+		src/fs/users_file.c \
+		src/fs/loans_file.c \
+		src/lib/dlist/dlist.c \
+		src/lib/dlist/dlist_priority.c \
+		src/lib/cutils/cutils.c \
+		src/model/book.c \
+		src/model/user.c \
+		src/model/loan.c \
+		-o $(BUILDDIR)/test_db
+	@echo "Running db layer integration test..."
+	$(BUILDDIR)/test_db.exe
