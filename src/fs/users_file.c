@@ -1,3 +1,14 @@
+/*
+    Filesystem helpers for the User model.
+
+    Like books_file.c, this module only knows how to:
+        - read users from a CSV text file into a DList
+        - write users from a DList back to a CSV file
+
+    The app and DB layers remain completely independent of
+    the actual file format.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,8 +18,10 @@
 
 #include "fs/users_file.h"
 
+/* Maximum length of a single CSV line when reading/writing users. */
 #define USER_LINE_MAX 512
 
+/* Strip trailing newlines from a line read with fgets. */
 static void trim_newline(char *s)
 {
     if (!s)
@@ -21,6 +34,15 @@ static void trim_newline(char *s)
     }
 }
 
+/*
+    Load all users from a CSV text file into a DList.
+
+    Layout is analogous to the books file:
+        - optional header line starting with "id;"
+        - one user per following line encoded via user_to_csv.
+
+    Return value semantics are the same as file_load_books.
+*/
 DList *file_load_users(const char *path)
 {
     FILE *f = fopen(path, "r");
@@ -82,6 +104,13 @@ DList *file_load_users(const char *path)
     return list;
 }
 
+/*
+    Write all users from the list to a CSV file.
+
+    Overwrites the file and writes:
+        - header: "id;name;email"
+        - one line per User in the list.
+*/
 int file_save_users(const char *path, const DList *users)
 {
     FILE *f = fopen(path, "w");

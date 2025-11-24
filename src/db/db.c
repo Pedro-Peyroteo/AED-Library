@@ -1,3 +1,19 @@
+/*
+	Implementation of the DB (in-memory database) layer.
+
+	This sits between the filesystem (CSV files) and the app layer.
+	It owns three DLists with heap-allocated elements:
+	- books: Book*
+	- users: User*
+	- loans: Loan*
+
+	The lifecycle is:
+		1) db_init:    load all data from disk into memory.
+		2) CRUD ops:   manipulate the in-memory lists during the program.
+		3) db_save:    write the current state back to disk.
+		4) db_destroy: free all memory.
+*/
+
 #include "db/db.h"
 
 #include <stdlib.h>
@@ -6,10 +22,18 @@
 #include "fs/users_file.h"
 #include "fs/loans_file.h"
 
+/* Small wrappers so dlist_destroy can free the stored elements. */
 static void free_book(void *p)  { free(p); }
 static void free_user(void *p)  { free(p); }
 static void free_loan(void *p)  { free(p); }
 
+/*
+	Loads all data from the filesystem layer into the DB.
+
+	On success, the three lists (books/users/loans) are ready to use.
+	On error (e.g. out of memory), any partially created lists
+	are destroyed and the function returns -1.
+*/
 int db_init(DB *db,
 			const char *books_path,
 			const char *users_path,
@@ -24,6 +48,7 @@ int db_init(DB *db,
 
 	if (!db->books || !db->users || !db->loans)
 	{
+		/* Clean up anything that was allocated before signaling failure. */
 		db_destroy(db);
 		return -1;
 	}
@@ -31,6 +56,11 @@ int db_init(DB *db,
 	return 0;
 }
 
+/*
+	Persists the current in-memory state of the DB to disk.
+	Each list is written using the filesystem helpers, overwriting
+	the corresponding .txt file with a header + all records.
+*/
 int db_save(const DB *db,
 			const char *books_path,
 			const char *users_path,
@@ -51,6 +81,10 @@ int db_save(const DB *db,
 	return ok;
 }
 
+/*
+	Releases all memory owned by the DB.
+	Each list is destroyed and every stored Book/User/Loan is freed.
+*/
 void db_destroy(DB *db)
 {
 	if (!db)
@@ -59,7 +93,7 @@ void db_destroy(DB *db)
 	if (db->books)
 		dlist_destroy(db->books, free_book);
 	if (db->users)
-        dlist_destroy(db->users, free_user);
+		dlist_destroy(db->users, free_user);
 	if (db->loans)
 		dlist_destroy(db->loans, free_loan);
 
@@ -67,6 +101,12 @@ void db_destroy(DB *db)
 	db->users = NULL;
 	db->loans = NULL;
 }
+
+/*
+	Linear search helpers.
+	These are small convenience functions used by the app layer
+	to locate a specific element by its id.
+*/
 
 Book *db_find_book_by_id(const DB *db, unsigned id)
 {
@@ -113,6 +153,18 @@ Loan *db_find_loan_by_id(const DB *db, unsigned id)
 	return NULL;
 }
 
+/*
+	CRUD - Create helpers.
+
+	Each "add" function:
+		- validates the DB and source pointer,
+		- allocates a new element on the heap,
+		- copies the contents of the provided struct,
+		- appends it to the appropriate list.
+
+	The caller is responsible for picking an id (e.g. next free id).
+*/
+
 int db_add_book(DB *db, const Book *src)
 {
 	if (!db || !db->books || !src)
@@ -122,10 +174,6 @@ int db_add_book(DB *db, const Book *src)
 	if (!b)
 		return -1;
 
-	/*
-		Simple struct copy. If you prefer a constructor-like
-		approach, you can call book_init here instead.
-	*/
 	*b = *src;
 
 	dlist_push_back(db->books, b);
@@ -162,6 +210,17 @@ int db_add_loan(DB *db, const Loan *src)
 	return 0;
 }
 
+/*
+	Internal helper for the "delete" operations.
+
+	Given:
+		- a list of elements (Book pointers, User pointers or Loan pointers)
+		- the id we want to remove
+		- a small callback that extracts the id from a void* element
+
+	it walks the list, finds the first matching element, and
+	removes plus frees it.
+*/
 static int db_remove_from_list(DList *list, unsigned id,
 							   unsigned (*get_id)(const void *))
 {
@@ -182,6 +241,8 @@ static int db_remove_from_list(DList *list, unsigned id,
 
 	return -1;
 }
+
+/* id accessors used by db_remove_from_list */
 
 static unsigned get_book_id(const void *p)
 {

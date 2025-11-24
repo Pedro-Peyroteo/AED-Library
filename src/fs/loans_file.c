@@ -1,3 +1,15 @@
+/*
+    Filesystem helpers for the Loan model.
+
+    Responsibilities are the same pattern as the other fs modules:
+        - file_load_loans: CSV text file -> DList of Loan*
+        - file_save_loans: DList of Loan* -> CSV text file
+
+    Loans reference books and users only by their ids; this layer
+    does not resolve those relations, it simply mirrors the fields
+    to and from the CSV representation.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,8 +19,10 @@
 
 #include "fs/loans_file.h"
 
+/* Maximum length of a single CSV line when reading/writing loans. */
 #define LOAN_LINE_MAX 512
 
+/* Remove trailing newline characters from input lines. */
 static void trim_newline(char *s)
 {
     if (!s)
@@ -21,6 +35,15 @@ static void trim_newline(char *s)
     }
 }
 
+/*
+    Load all loans from a CSV file into a DList.
+
+    File format:
+        - optional header starting with "id;"
+        - one line per loan encoded using loan_to_csv / loan_from_csv.
+
+    Return value semantics follow the same rules as file_load_books.
+*/
 DList *file_load_loans(const char *path)
 {
     FILE *f = fopen(path, "r");
@@ -82,6 +105,12 @@ DList *file_load_loans(const char *path)
     return list;
 }
 
+/*
+    Write all loans to a CSV text file, overwriting the file.
+
+    Header written:
+        "id;user_id;book_id;date_borrow;date_return"
+*/
 int file_save_loans(const char *path, const DList *loans)
 {
     FILE *f = fopen(path, "w");
