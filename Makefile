@@ -15,8 +15,10 @@ TARGET   := $(BUILDDIR)/main
 SRC := \
 	src/app/main.c \
 	src/app/app.c \
-	src/app/controller.c \
 	src/app/menu.c \
+	src/app/user_controller.c \
+	src/app/book_controller.c \
+	src/app/loan_controller.c \
 	src/db/db.c \
 	src/fs/books_file.c \
 	src/fs/users_file.c \
@@ -74,7 +76,7 @@ clean:
 # =====================================================
 #   PHONY
 # =====================================================
-.PHONY: all clean test-dlist test-fs test-db
+.PHONY: all clean test-dlist test-fs test-db test-db-edge
 
 # =====================================================
 #   TEST: FS LAYER
@@ -135,6 +137,37 @@ test-db: src/tests/test_db.c \
 		-o $(BUILDDIR)/test_db
 	@echo "Running db layer integration test..."
 	$(BUILDDIR)/test_db.exe
+
+# =====================================================
+#   DB USAGE EXAMPLE (standalone demo)
+# =====================================================
+example-db: src/tests/example_db_usage.c \
+	src/db/db.c \
+	src/fs/books_file.c \
+	src/fs/users_file.c \
+	src/fs/loans_file.c \
+	src/lib/dlist/dlist.c \
+	src/lib/dlist/dlist_priority.c \
+	src/lib/cutils/cutils.c \
+	src/model/book.c \
+	src/model/user.c \
+	src/model/loan.c
+	@if not exist "$(BUILDDIR)" mkdir "$(BUILDDIR)"
+	$(CC) $(CFLAGS) \
+		src/tests/example_db_usage.c \
+		src/db/db.c \
+		src/fs/books_file.c \
+		src/fs/users_file.c \
+		src/fs/loans_file.c \
+		src/lib/dlist/dlist.c \
+		src/lib/dlist/dlist_priority.c \
+		src/lib/cutils/cutils.c \
+		src/model/book.c \
+		src/model/user.c \
+		src/model/loan.c \
+		-o $(BUILDDIR)/example_db_usage
+	@echo "Running DB usage example..."
+	$(BUILDDIR)/example_db_usage.exe
 
 # =====================================================
 #   RUN MAIN APPLICATION

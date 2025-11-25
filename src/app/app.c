@@ -12,7 +12,6 @@
 
 	main.c only calls app_init/app_run/app_shutdown.
 */
-
 static DB db; /* shared in-memory database for the whole app */
 
 void app_init(void)
