@@ -82,40 +82,40 @@ void menuEmprestimos(DB *db)
 }
 
 void menuSugestoes(DB *db)
-{ /*
-	 int opcao;
+{
+	int opcao;
 
-	 do
-	 {
-		 printf("\n=== MENU SUGESTOES ===\n");
-		 printf("1. Sugerir aquisição de um livro\n");
-		 printf("2. Listar todas as sugestões\n");
-		 printf("0. Voltar ao menu principal\n");
-		 printf("Escolha uma opção: ");
+	do
+	{
+		printf("\n=== MENU SUGESTOES ===\n");
+		printf("1. Sugerir aquisição de um livro\n");
+		printf("2. Listar todas as sugestões\n");
+		printf("0. Voltar ao menu principal\n");
+		printf("Escolha uma opção: ");
 
-		 if (scanf("%d", &opcao) != 1)
-		 {
-			 printf(" Opção inválida.\n");
-			 opcao = -1;
-		 }
-		 while (getchar() != '\n')
-			 ; // Limpa o buffer de input
+		if (scanf("%d", &opcao) != 1)
+		{
+			printf(" Opção inválida.\n");
+			opcao = -1;
+		}
+		while (getchar() != '\n')
+			; // Limpa o buffer de input
 
-		 switch (opcao)
-		 {
-		 case 1:
-			 suggestion_register(db);
-			 break;
-		 case 2:
-			 suggestion_list_all(db);
-			 break;
-		 case 0:
-			 printf("A sair do Menu Sugestões.\n");
-			 break;
-		 default:
-			 printf("Opção inválida. Tente novamente.\n");
-			 break;
-		 }
+		switch (opcao)
+		{
+		case 1:
+			suggestion_register(db);
+			break;
+		case 2:
+			suggestion_list_all(db);
+			break;
+		case 0:
+			printf("A sair do Menu Sugestões.\n");
+			break;
+		default:
+			printf("Opção inválida. Tente novamente.\n");
+			break;
+		}
 
-	 } while (opcao != 0);*/
+	} while (opcao != 0);
 }

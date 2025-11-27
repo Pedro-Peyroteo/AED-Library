@@ -68,31 +68,28 @@ void book_to_csv(const Book *b, char *out, size_t out_size)
 }
 
 // =========================================================
-// FUNÇÕES PARA O MODELO SUGGESTION (A SEREM ADICIONADAS)
+// FUNÇÕES PARA O MODELO SUGGESTION
 // =========================================================
-
-// --- Constantes para Sugestão (Se não estiverem em books.h) ---
-#define SUGG_TITLE_MAX 100
-#define SUGG_AUTHOR_MAX 100
 
 // --- Implementação da Estrutura Suggestion ---
 
 typedef struct
 {
     unsigned id;
-    char title[SUGG_TITLE_MAX];
-    char author[SUGG_AUTHOR_MAX];
+    char title[100];
+    char author[100];
 } Suggestion;
 
 // Inicializa a estrutura Suggestion.
 void suggestion_init(Suggestion *s, unsigned id,
-                     const char *title, const char *author)
+                     const char *title, const char *author, int edition)
 {
     s->id = id;
     strncpy(s->title, title, sizeof(s->title));
     s->title[sizeof(s->title) - 1] = '\0';
     strncpy(s->author, author, sizeof(s->author));
     s->author[sizeof(s->author) - 1] = '\0';
+    s->edition = edition;
 }
 
 /**
@@ -123,6 +120,12 @@ int suggestion_from_csv(Suggestion *s, const char *line)
     strncpy(s->author, token, sizeof(s->author)); // 3. Lê o Autor
     s->author[sizeof(s->author) - 1] = '\0';
 
+    token = strtok(NULL, ";");
+    if (!token)
+        return 0;
+    strncpy(s->edition, token, sizeof(s->edition)); // 4. Lê a edição
+    s->edition[sizeof(s->edition) - 1] = '\0';
+
     return 1;
 }
 
@@ -134,5 +137,51 @@ void suggestion_to_csv(const Suggestion *s, char *out, size_t out_size)
     snprintf(out, out_size, "%u;%s;%s",
              s->id,
              s->title,
-             s->author);
+             s->author,
+             s->edition);
+}
+
+// Inicializa a estrutura Suggestion.
+void suggestion_init(Suggestion *s, unsigned id,
+                     const char *title, const char *author, int edition) // <--- ARGUMENTO ADICIONADO
+{
+    s->id = id;
+    strncpy(s->title, title, sizeof(s->title));
+    s->title[sizeof(s->title) - 1] = '\0';
+    strncpy(s->author, author, sizeof(s->author));
+    s->author[sizeof(s->author) - 1] = '\0';
+    s->edition = edition; // <--- ATRIBUIÇÃO ADICIONADA
+}
+
+int suggestion_from_csv(Suggestion *s, const char *line)
+{
+    // A função original para Book é mais robusta, vamos usá-la como base
+    char tmp[512];
+    strncpy(tmp, line, sizeof(tmp));
+    tmp[sizeof(tmp) - 1] = '\0';
+
+    char *token = strtok(tmp, ";");
+    if (!token)
+        return 0;
+    s->id = atoi(token); // 1. Lê o ID
+
+    token = strtok(NULL, ";");
+    if (!token)
+        return 0;
+    strncpy(s->title, token, sizeof(s->title)); // 2. Lê o Título
+    s->title[sizeof(s->title) - 1] = '\0';
+
+    token = strtok(NULL, ";");
+    if (!token)
+        return 0;
+    strncpy(s->author, token, sizeof(s->author)); // 3. Lê o Autor
+    s->author[sizeof(s->author) - 1] = '\0';
+
+        // 4. Lê a Edição
+        token = strtok(NULL, ";");
+    if (!token)
+        return 0;
+    s->edition = atoi(token); // Leitura da EDIÇÃO
+
+    return 1;
 }
