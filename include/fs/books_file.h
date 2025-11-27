@@ -36,4 +36,20 @@ DList *file_load_books(const char *path);
  */
 int file_save_books(const char *path, const DList *books);
 
+/**
+ * @brief Lê todas as sugestões do ficheiro 'suggestions.txt' para uma DList.
+ * * @param path O caminho para o ficheiro suggestions.txt.
+ * @return DList* com ponteiros para Suggestion, ou NULL em caso de erro de memória.
+ */
+DList *file_load_suggestions(const char *path);
+
+/**
+ * @brief Escreve a DList de sugestões para o ficheiro 'suggestions.txt'.
+ * * O ficheiro existente é sobrescrito.
+ * * @param path O caminho para o ficheiro suggestions.txt.
+ * @param suggestions A lista de sugestões a guardar.
+ * @return 0 em caso de sucesso, -1 em caso de falha na abertura do ficheiro.
+ */
+int file_save_suggestions(const char *path, const DList *suggestions);
+
 #endif // BOOKS_FILE_H
