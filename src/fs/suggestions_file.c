@@ -6,6 +6,12 @@
 
 #define SUGGESTION_LINE_MAX 512
 
+/* Reutilizamos o id como prioridade para ordenar sugestoes sem logica adicional. */
+static int suggestion_priority(unsigned id)
+{
+    return (int)id;
+}
+
 static void trim_newline(char *s)
 {
     if (!s)
@@ -23,10 +29,10 @@ DList *file_load_suggestions(const char *path)
     FILE *f = fopen(path, "r");
     if (!f)
     {
-        return dlist_create(false, NULL);
+        return dlist_create(true, NULL);
     }
 
-    DList *list = dlist_create(false, NULL);
+    DList *list = dlist_create(true, NULL);
     if (!list)
     {
         fclose(f);
@@ -43,7 +49,7 @@ DList *file_load_suggestions(const char *path)
             Suggestion *first = malloc(sizeof *first);
             if (first && suggestion_from_csv(first, line))
             {
-                dlist_push_back(list, first);
+                dlist_insert_priority(list, first, suggestion_priority(first->id));
             }
             else if (first)
             {
@@ -68,7 +74,7 @@ DList *file_load_suggestions(const char *path)
             continue;
         }
 
-        dlist_push_back(list, s);
+        dlist_insert_priority(list, s, suggestion_priority(s->id));
     }
 
     fclose(f);
