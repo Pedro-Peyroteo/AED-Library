@@ -280,20 +280,6 @@ int db_add_suggestion(DB *db, const Suggestion *src)
 	return 0;
 }
 
-int db_add_suggestion(DB *db, const Suggestion *src)
-{
-	if (!db || !db->suggestions || !src)
-		return -1;
-
-	Suggestion *s = malloc(sizeof *s);
-	if (!s)
-		return -1;
-
-	*s = *src;
-	dlist_push_back(db->suggestions, s);
-	return 0;
-}
-
 /*
 	Internal helper for the "delete" operations.
 
