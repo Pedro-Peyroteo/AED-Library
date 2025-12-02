@@ -11,6 +11,25 @@ LDFLAGS  :=
 BUILDDIR := build
 TARGET   := $(BUILDDIR)/main
 
+# Platform helpers for mkdir/rmdir and executable suffix
+ifeq ($(OS),Windows_NT)
+	EXEEXT := .exe
+define MKDIR_P
+	@if not exist "$(subst /,\\,$(1))" mkdir "$(subst /,\\,$(1))"
+endef
+define RM_DIR
+	@if exist "$(subst /,\\,$(1))" rmdir /S /Q "$(subst /,\\,$(1))"
+endef
+else
+	EXEEXT :=
+define MKDIR_P
+	@mkdir -p $(1)
+endef
+define RM_DIR
+	@rm -rf $(1)
+endef
+endif
+
 # Manually list all source files (avoids Unix 'find')
 SRC := \
 	src/app/main.c \
@@ -43,13 +62,13 @@ all: $(TARGET)
 
 # Link final executable
 $(TARGET): $(OBJ)
-	@if not exist "$(BUILDDIR)" mkdir "$(BUILDDIR)"
+	$(call MKDIR_P,$(BUILDDIR))
 	$(CC) $(OBJ) -o $(TARGET) $(LDFLAGS)
 	@echo "Build successful."
 
 # Compile object files
 $(BUILDDIR)/%.o: src/%.c
-	@if not exist "$(dir $@)" mkdir "$(dir $@)"
+	$(call MKDIR_P,$(dir $@))
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # =====================================================
@@ -59,7 +78,7 @@ test-dlist: src/tests/test_dlist.c \
             src/lib/dlist/dlist.c \
             src/lib/dlist/dlist_priority.c \
             src/lib/cutils/cutils.c
-	@if not exist "$(BUILDDIR)" mkdir "$(BUILDDIR)"
+	$(call MKDIR_P,$(BUILDDIR))
 	$(CC) $(CFLAGS) \
 		src/tests/test_dlist.c \
 		src/lib/dlist/dlist.c \
@@ -67,13 +86,13 @@ test-dlist: src/tests/test_dlist.c \
 		src/lib/cutils/cutils.c \
 		-o $(BUILDDIR)/test_dlist
 	@echo "Running test..."
-	$(BUILDDIR)/test_dlist.exe
+	$(BUILDDIR)/test_dlist$(EXEEXT)
 
 # =====================================================
 #   CLEAN
 # =====================================================
 clean:
-	if exist "$(BUILDDIR)" rmdir /S /Q "$(BUILDDIR)"
+	$(call RM_DIR,$(BUILDDIR))
 	@echo "Cleaned."
 
 # =====================================================
@@ -96,7 +115,7 @@ test-fs: src/tests/test_fs.c \
 	src/model/user.c \
 	src/model/loan.c \
 	src/model/suggestion.c
-	@if not exist "$(BUILDDIR)" mkdir "$(BUILDDIR)"
+	$(call MKDIR_P,$(BUILDDIR))
 	$(CC) $(CFLAGS) \
 		src/tests/test_fs.c \
 		src/fs/books_file.c \
@@ -110,7 +129,7 @@ test-fs: src/tests/test_fs.c \
 		src/model/loan.c \
 		-o $(BUILDDIR)/test_fs
 	@echo "Running fs layer test..."
-	$(BUILDDIR)/test_fs.exe
+	$(BUILDDIR)/test_fs$(EXEEXT)
 
 # =====================================================
 #   TEST: DB LAYER (integrated with FS)
@@ -126,7 +145,7 @@ test-db: src/tests/test_db.c \
 	src/model/book.c \
 	src/model/user.c \
 	src/model/loan.c
-	@if not exist "$(BUILDDIR)" mkdir "$(BUILDDIR)"
+	$(call MKDIR_P,$(BUILDDIR))
 	$(CC) $(CFLAGS) \
 		src/tests/test_db.c \
 		src/db/db.c \
@@ -143,7 +162,7 @@ test-db: src/tests/test_db.c \
 		src/model/suggestion.c \
 		-o $(BUILDDIR)/test_db
 	@echo "Running db layer integration test..."
-	$(BUILDDIR)/test_db.exe
+	$(BUILDDIR)/test_db$(EXEEXT)
 
 # =====================================================
 #   DB USAGE EXAMPLE (standalone demo)
@@ -161,7 +180,7 @@ example-db: src/tests/example_db_usage.c \
 	src/model/user.c \
 	src/model/loan.c \
 	src/model/suggestion.c
-	@if not exist "$(BUILDDIR)" mkdir "$(BUILDDIR)"
+	$(call MKDIR_P,$(BUILDDIR))
 	$(CC) $(CFLAGS) \
 		src/tests/example_db_usage.c \
 		src/db/db.c \
@@ -178,11 +197,11 @@ example-db: src/tests/example_db_usage.c \
 		src/model/suggestion.c \
 		-o $(BUILDDIR)/example_db_usage
 	@echo "Running DB usage example..."
-	$(BUILDDIR)/example_db_usage.exe
+	$(BUILDDIR)/example_db_usage$(EXEEXT)
 
 # =====================================================
 #   RUN MAIN APPLICATION
 # =====================================================
 run: all
 	@echo "Running main application..."
-	$(TARGET).exe
+	$(TARGET)$(EXEEXT)
