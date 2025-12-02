@@ -17,6 +17,7 @@
 #include "db/db.h"
 
 #include <stdlib.h>
+#include <limits.h>
 
 #include "fs/books_file.h"
 #include "fs/users_file.h"
@@ -28,6 +29,14 @@ static void free_book(void *p)  { free(p); }
 static void free_user(void *p)  { free(p); }
 static void free_loan(void *p)  { free(p); }
 static void free_suggestion(void *p) { free(p); }
+
+/* Traduz ids unsigned para prioridades int usadas pela DList. */
+static int id_priority(unsigned id)
+{
+	if (id >= (unsigned)INT_MAX)
+		return INT_MAX;
+	return (int)id;
+}
 
 /*
 	Loads all data from the filesystem layer into the DB.
@@ -223,7 +232,7 @@ int db_add_book(DB *db, const Book *src)
 
 	*b = *src;
 
-	dlist_push_back(db->books, b);
+	dlist_insert_priority(db->books, b, id_priority(b->id));
 	return 0;
 }
 
@@ -238,7 +247,7 @@ int db_add_user(DB *db, const User *src)
 
 	*u = *src;
 
-	dlist_push_back(db->users, u);
+	dlist_insert_priority(db->users, u, id_priority(u->id));
 	return 0;
 }
 
@@ -253,7 +262,7 @@ int db_add_loan(DB *db, const Loan *src)
 
 	*l = *src;
 
-	dlist_push_back(db->loans, l);
+	dlist_insert_priority(db->loans, l, id_priority(l->id));
 	return 0;
 }
 
@@ -267,7 +276,7 @@ int db_add_suggestion(DB *db, const Suggestion *src)
 		return -1;
 
 	*s = *src;
-	dlist_push_back(db->suggestions, s);
+	dlist_insert_priority(db->suggestions, s, id_priority(s->id));
 	return 0;
 }
 

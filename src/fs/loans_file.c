@@ -22,6 +22,12 @@
 /* Maximum length of a single CSV line when reading/writing loans. */
 #define LOAN_LINE_MAX 512
 
+/* Id mais alto fica primeiro, garantindo que os novos emprestimos surgem no topo. */
+static int loan_priority(unsigned id)
+{
+    return (int)id;
+}
+
 /* Remove trailing newline characters from input lines. */
 static void trim_newline(char *s)
 {
@@ -50,11 +56,11 @@ DList *file_load_loans(const char *path)
 
     if (!f)
     {
-        DList *empty = dlist_create(false, NULL);
+        DList *empty = dlist_create(true, NULL);
         return empty;
     }
 
-    DList *list = dlist_create(false, NULL);
+    DList *list = dlist_create(true, NULL);
     if (!list)
     {
         fclose(f);
@@ -72,7 +78,7 @@ DList *file_load_loans(const char *path)
             Loan *first = malloc(sizeof *first);
             if (first && loan_from_csv(first, line) == 0)
             {
-                dlist_push_back(list, first);
+                dlist_insert_priority(list, first, loan_priority(first->id));
             }
             else if (first)
             {
@@ -98,7 +104,7 @@ DList *file_load_loans(const char *path)
             continue;
         }
 
-        dlist_push_back(list, l);
+        dlist_insert_priority(list, l, loan_priority(l->id));
     }
 
     fclose(f);

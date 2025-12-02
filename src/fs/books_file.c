@@ -23,6 +23,15 @@
 #define BOOK_LINE_MAX 512
 
 /*
+	Prioridade simples baseada no id para manter a lista ordenada
+	assim que cada livro e carregado, sem passos extra de ordenacao.
+*/
+static int book_priority(unsigned id)
+{
+	return (int)id;
+}
+
+/*
 	Utility: remove trailing '\n' or '\r' characters from a buffer
 	read with fgets, so that CSV parsing works as expected.
 */
@@ -59,11 +68,11 @@ DList *file_load_books(const char *path)
 	if (!f)
 	{
 		/* If the file does not exist, treat as empty list. */
-		DList *empty = dlist_create(false, NULL);
+		DList *empty = dlist_create(true, NULL);
 		return empty;
 	}
 
-	DList *list = dlist_create(false, NULL);
+	DList *list = dlist_create(true, NULL);
 	if (!list)
 	{
 		fclose(f);
@@ -83,7 +92,7 @@ DList *file_load_books(const char *path)
 			Book *first = malloc(sizeof *first);
 			if (first && book_from_csv(first, line) == 0)
 			{
-				dlist_push_back(list, first);
+				dlist_insert_priority(list, first, book_priority(first->id));
 			}
 			else if (first)
 			{
@@ -110,7 +119,7 @@ DList *file_load_books(const char *path)
 			continue;
 		}
 
-		dlist_push_back(list, b);
+		dlist_insert_priority(list, b, book_priority(b->id));
 	}
 
 	fclose(f);
