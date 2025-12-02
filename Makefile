@@ -19,16 +19,19 @@ SRC := \
 	src/app/user_controller.c \
 	src/app/book_controller.c \
 	src/app/loan_controller.c \
+	src/app/suggestion_controller.c \
 	src/db/db.c \
 	src/fs/books_file.c \
 	src/fs/users_file.c \
 	src/fs/loans_file.c \
+	src/fs/suggestions_file.c \
 	src/lib/cutils/cutils.c \
 	src/lib/dlist/dlist.c \
 	src/lib/dlist/dlist_priority.c \
 	src/model/book.c \
 	src/model/loan.c \
-	src/model/user.c
+	src/model/user.c \
+	src/model/suggestion.c
 
 # Convert src/.../*.c  build/.../*.o
 OBJ := $(patsubst src/%.c,$(BUILDDIR)/%.o,$(SRC))
@@ -85,12 +88,14 @@ test-fs: src/tests/test_fs.c \
 	src/fs/books_file.c \
 	src/fs/users_file.c \
 	src/fs/loans_file.c \
+	src/fs/suggestions_file.c \
 	src/lib/dlist/dlist.c \
 	src/lib/dlist/dlist_priority.c \
 	src/lib/cutils/cutils.c \
 	src/model/book.c \
 	src/model/user.c \
-	src/model/loan.c
+	src/model/loan.c \
+	src/model/suggestion.c
 	@if not exist "$(BUILDDIR)" mkdir "$(BUILDDIR)"
 	$(CC) $(CFLAGS) \
 		src/tests/test_fs.c \
@@ -128,12 +133,14 @@ test-db: src/tests/test_db.c \
 		src/fs/books_file.c \
 		src/fs/users_file.c \
 		src/fs/loans_file.c \
+		src/fs/suggestions_file.c \
 		src/lib/dlist/dlist.c \
 		src/lib/dlist/dlist_priority.c \
 		src/lib/cutils/cutils.c \
 		src/model/book.c \
 		src/model/user.c \
 		src/model/loan.c \
+		src/model/suggestion.c \
 		-o $(BUILDDIR)/test_db
 	@echo "Running db layer integration test..."
 	$(BUILDDIR)/test_db.exe
@@ -146,12 +153,14 @@ example-db: src/tests/example_db_usage.c \
 	src/fs/books_file.c \
 	src/fs/users_file.c \
 	src/fs/loans_file.c \
+	src/fs/suggestions_file.c \
 	src/lib/dlist/dlist.c \
 	src/lib/dlist/dlist_priority.c \
 	src/lib/cutils/cutils.c \
 	src/model/book.c \
 	src/model/user.c \
-	src/model/loan.c
+	src/model/loan.c \
+	src/model/suggestion.c
 	@if not exist "$(BUILDDIR)" mkdir "$(BUILDDIR)"
 	$(CC) $(CFLAGS) \
 		src/tests/example_db_usage.c \
@@ -159,12 +168,14 @@ example-db: src/tests/example_db_usage.c \
 		src/fs/books_file.c \
 		src/fs/users_file.c \
 		src/fs/loans_file.c \
+		src/fs/suggestions_file.c \
 		src/lib/dlist/dlist.c \
 		src/lib/dlist/dlist_priority.c \
 		src/lib/cutils/cutils.c \
 		src/model/book.c \
 		src/model/user.c \
 		src/model/loan.c \
+		src/model/suggestion.c \
 		-o $(BUILDDIR)/example_db_usage
 	@echo "Running DB usage example..."
 	$(BUILDDIR)/example_db_usage.exe

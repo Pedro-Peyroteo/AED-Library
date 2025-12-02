@@ -19,9 +19,10 @@ void app_init(void)
 	printf("App iniciada.\n");
 
 	if (db_init(&db,
-			   "data/books.txt",
-			   "data/users.txt",
-			   "data/loans.txt") != 0)
+		   "data/books.txt",
+		   "data/users.txt",
+		   "data/loans.txt",
+		   "data/suggestions.txt") != 0)
 	{
 		printf("Erro ao carregar dados da base de dados.\n");
 		/*
@@ -71,9 +72,10 @@ void app_run(void)
 void app_shutdown(void)
 {
 	if (db_save(&db,
-			  "data/books.txt",
-			  "data/users.txt",
-			  "data/loans.txt") != 0)
+		  "data/books.txt",
+		  "data/users.txt",
+		  "data/loans.txt",
+		  "data/suggestions.txt") != 0)
 	{
 		printf("Aviso: erro ao guardar dados.\n");
 	}

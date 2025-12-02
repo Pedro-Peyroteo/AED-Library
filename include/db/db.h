@@ -5,6 +5,7 @@
 #include "model/books.h"
 #include "model/user.h"
 #include "model/loans.h"
+#include "model/suggestion.h"
 
 /*
 	Central in-memory database for the library.
@@ -22,6 +23,7 @@ typedef struct DB {
 	DList *books;
 	DList *users;
 	DList *loans;
+	DList *suggestions;
 } DB;
 
 /*
@@ -37,7 +39,8 @@ typedef struct DB {
 int db_init(DB *db,
 			const char *books_path,
 			const char *users_path,
-			const char *loans_path);
+			const char *loans_path,
+			const char *suggestions_path);
 
 /*
 	Saves the current contents of the DB back to disk.
@@ -49,7 +52,8 @@ int db_init(DB *db,
 int db_save(const DB *db,
 			const char *books_path,
 			const char *users_path,
-			const char *loans_path);
+			const char *loans_path,
+			const char *suggestions_path);
 
 /*
 	Frees all memory owned by the DB.
@@ -64,11 +68,13 @@ void db_destroy(DB *db);
 Book *db_find_book_by_id(const DB *db, unsigned id);
 User *db_find_user_by_id(const DB *db, unsigned id);
 Loan *db_find_loan_by_id(const DB *db, unsigned id);
+Suggestion *db_find_suggestion_by_id(const DB *db, unsigned id);
 
 /* Give read-only access to the internal lists (for iteration). */
 DList *db_get_books(const DB *db);
 DList *db_get_users(const DB *db);
 DList *db_get_loans(const DB *db);
+DList *db_get_suggestions(const DB *db);
 
 /*
 	Basic CRUD helpers.
@@ -88,6 +94,7 @@ DList *db_get_loans(const DB *db);
 int db_add_book(DB *db, const Book *src);
 int db_add_user(DB *db, const User *src);
 int db_add_loan(DB *db, const Loan *src);
+int db_add_suggestion(DB *db, const Suggestion *src);
 
 /*
 	Remove an element by id.
@@ -104,6 +111,7 @@ int db_add_loan(DB *db, const Loan *src);
 int db_remove_book(DB *db, unsigned id);
 int db_remove_user(DB *db, unsigned id);
 int db_remove_loan(DB *db, unsigned id);
+int db_remove_suggestion(DB *db, unsigned id);
 
 #endif /* DB_H */
 
