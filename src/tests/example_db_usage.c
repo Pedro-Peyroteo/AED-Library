@@ -82,6 +82,7 @@ int main(void)
     const char *books_path = "data/books.txt";
     const char *users_path = "data/users.txt";
     const char *loans_path = "data/loans.txt";
+    const char *suggestions_path = "data/suggestions.txt";
 
     DB db; /* in-memory database instance */
     /*
@@ -89,7 +90,7 @@ int main(void)
         Se os ficheiros não existirem, obtemos simplesmente
         listas vazias (a camada fs trata disso).
     */
-    if (db_init(&db, books_path, users_path, loans_path) != 0)
+    if (db_init(&db, books_path, users_path, loans_path, suggestions_path) != 0)
     {
         printf("db_init failed (starting with empty DB).\n");
         /* we still continue; lists may be empty */
@@ -172,7 +173,7 @@ int main(void)
     }
 
     /* Save any changes and clean up. */
-    if (db_save(&db, books_path, users_path, loans_path) != 0)
+    if (db_save(&db, books_path, users_path, loans_path, suggestions_path) != 0)
         printf("Warning: db_save failed.\n");
 
     db_destroy(&db);
