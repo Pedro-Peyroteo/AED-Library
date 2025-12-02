@@ -1,4 +1,12 @@
 #include <stdio.h>
+#include <errno.h>
+
+#ifdef _WIN32
+#include <direct.h>
+#else
+#include <sys/stat.h>
+#include <sys/types.h>
+#endif
 
 #include "app/app.h"
 #include "app/menu.h"
@@ -14,9 +22,31 @@
 */
 static DB db; /* shared in-memory database for the whole app */
 
+/* Pequeno helper cross-platform para criar 'data/' se ainda nao existir. */
+static int ensure_data_directory(void)
+{
+	const char *path = "data";
+
+#ifdef _WIN32
+	if (_mkdir(path) == 0)
+		return 0;
+#else
+	if (mkdir(path, 0777) == 0)
+		return 0;
+#endif
+
+	if (errno == EEXIST)
+		return 0;
+
+	return -1;
+}
+
 void app_init(void)
 {
 	printf("App iniciada.\n");
+
+	if (ensure_data_directory() != 0)
+		printf("Aviso: nao foi possivel criar o diretorio 'data/'.\n");
 
 	if (db_init(&db,
 		   "data/books.txt",
