@@ -83,18 +83,17 @@ int db_save(const DB *db,
 	if (!db)
 		return -1;
 
-		int ok = 0;
+	int ok = 0;
 
-		if (file_save_books(books_path, db->books) != 0)
-			ok = -1;
-		if (file_save_users(users_path, db->users) != 0)
-			ok = -1;
-		if (file_save_loans(loans_path, db->loans) != 0)
-			ok = -1;
-		if (file_save_suggestions(suggestions_path, db->suggestions) != 0)
-			ok = -1;
-
-		return ok;
+	if (file_save_books(books_path, db->books) != 0)
+		ok = -1;
+	if (file_save_users(users_path, db->users) != 0)
+		ok = -1;
+	if (file_save_loans(loans_path, db->loans) != 0)
+		ok = -1;
+	if (file_save_suggestions(suggestions_path, db->suggestions) != 0)
+		ok = -1;
+	return ok;
 }
 
 /*
