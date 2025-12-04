@@ -16,8 +16,52 @@
 */
 void menuClientes(DB *db)
 {
-	printf("\n=== MENU CLIENTES ===\n");
-	user_list_all(db);
+	int opcao;
+
+	do
+	{
+		printf("\n=== MENU CLIENTES ===\n");
+		printf("1. Inserir novo cliente\n");
+		printf("2. Editar cliente\n");
+		printf("3. Eliminar cliente\n");
+		printf("4. Pesquisar clientes\n");
+		printf("5. Listar todos os clientes\n");
+		printf("0. Voltar ao menu principal\n");
+		printf("Escolha uma opcao: ");
+
+		if (scanf("%d", &opcao) != 1)
+		{
+			printf("Opcao invalida.\n");
+			opcao = -1;
+		}
+		while (getchar() != '\n')
+			;
+
+		switch (opcao)
+		{
+		case 1:
+			user_insert(db);
+			break;
+		case 2:
+			user_edit(db);
+			break;
+		case 3:
+			user_delete(db);
+			break;
+		case 4:
+			user_search(db);
+			break;
+		case 5:
+			user_list_all(db);
+			break;
+		case 0:
+			printf("A sair do menu de clientes.\n");
+			break;
+		default:
+			printf("Opcao invalida. Tente novamente.\n");
+			break;
+		}
+	} while (opcao != 0);
 }
 
 void menuLivros(DB *db)

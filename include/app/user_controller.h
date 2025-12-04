@@ -4,5 +4,8 @@
 
 /* Operacoes de negocio simples relacionadas com utilizadores. */
 
-/* Apenas um exemplo: listar todos os utilizadores existentes. */
 void user_list_all(const DB *db);
+void user_insert(DB *db);
+void user_edit(DB *db);
+void user_delete(DB *db);
+void user_search(DB *db);
