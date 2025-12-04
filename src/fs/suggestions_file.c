@@ -88,7 +88,6 @@ int file_save_suggestions(const char *path, const DList *suggestions)
         return -1;
 
     char buffer[SUGGESTION_LINE_MAX];
-    /* Header: include edition/edicao field added recently */
     fprintf(f, "id;title;author;isbn;edition\n");
 
     if (suggestions)
