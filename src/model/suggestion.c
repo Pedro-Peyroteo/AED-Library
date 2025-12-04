@@ -74,7 +74,8 @@ void suggestion_to_csv(const Suggestion *s, char *out, size_t out_size)
     if (!s || !out || out_size == 0)
         return;
 
-    snprintf(out, out_size, "%u;%s;%s;%s",
+    /* Write CSV: id;title;author;isbn;edition */
+    snprintf(out, out_size, "%u;%s;%s;%s;%s",
              s->id,
              s->title,
              s->author,
