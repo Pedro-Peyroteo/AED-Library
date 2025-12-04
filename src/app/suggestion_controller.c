@@ -64,6 +64,7 @@ void suggestion_register(DB *db)
     char title[128];
     char author[128];
     char isbn[32];
+    char edition[32];
 
     printf("\n--- REGISTAR SUGESTAO ---\n");
 
@@ -85,6 +86,9 @@ void suggestion_register(DB *db)
 
     printf("ISBN (opcional, pressione Enter para saltar): ");
     read_line(isbn, sizeof isbn);
+
+    printf("Edicao (opcional, pressione Enter para saltar): ");
+    read_line(edition, sizeof edition);
 
     DList *books = db_get_books(db);
     if (books)
@@ -115,7 +119,7 @@ void suggestion_register(DB *db)
     }
 
     Suggestion new_suggestion;
-    suggestion_init(&new_suggestion, next_suggestion_id(db), title, author, isbn);
+    suggestion_init(&new_suggestion, next_suggestion_id(db), title, author, isbn, edition);
 
     if (db_add_suggestion(db, &new_suggestion) == 0)
         printf("[sugestoes] Sugestao registada com sucesso (id=%u).\n", new_suggestion.id);
@@ -142,7 +146,7 @@ void suggestion_list_all(const DB *db)
     DLIST_FOREACH(suggestions, node)
     {
         Suggestion *s = (Suggestion *)node->data;
-        printf("  id=%u, titulo=%s, autor=%s, isbn=%s\n",
-               s->id, s->title, s->author, s->isbn[0] ? s->isbn : "(n/d)");
+        printf("  id=%u, titulo=%s, autor=%s, isbn=%s, edicao=%s\n",
+               s->id, s->title, s->author, s->isbn[0] ? s->isbn : "(n/d)", s->edition[0] ? s->edition : "(n/d)");
     }
 }

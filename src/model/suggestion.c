@@ -8,7 +8,8 @@ void suggestion_init(Suggestion *s,
                      unsigned id,
                      const char *title,
                      const char *author,
-                     const char *isbn)
+                     const char *isbn,
+                     const char *edition)
 {
     if (!s)
         return;
@@ -22,6 +23,9 @@ void suggestion_init(Suggestion *s,
 
     strncpy(s->isbn, isbn ? isbn : "", sizeof(s->isbn));
     s->isbn[sizeof(s->isbn) - 1] = '\0';
+
+    strncpy(s->edition, edition ? edition : "", sizeof(s->edition));
+    s->edition[sizeof(s->edition) - 1] = '\0';
 }
 
 int suggestion_from_csv(Suggestion *s, const char *line)
@@ -56,6 +60,12 @@ int suggestion_from_csv(Suggestion *s, const char *line)
     strncpy(s->isbn, token, sizeof(s->isbn));
     s->isbn[sizeof(s->isbn) - 1] = '\0';
 
+    token = strtok(NULL, ";");
+    if (!token)
+        return 0;
+    strncpy(s->edition, token, sizeof(s->edition));
+    s->edition[sizeof(s->edition) - 1] = '\0';
+
     return 1;
 }
 
@@ -68,5 +78,6 @@ void suggestion_to_csv(const Suggestion *s, char *out, size_t out_size)
              s->id,
              s->title,
              s->author,
-             s->isbn);
+             s->isbn,
+             s->edition);
 }
