@@ -21,6 +21,12 @@
 /* Maximum length of a single CSV line when reading/writing users. */
 #define USER_LINE_MAX 512
 
+/* Mantemos a mesma regra de prioridade por id para reutilizar a ordenacao automatica. */
+static int user_priority(unsigned id)
+{
+    return (int)id;
+}
+
 /* Strip trailing newlines from a line read with fgets. */
 static void trim_newline(char *s)
 {
@@ -49,11 +55,11 @@ DList *file_load_users(const char *path)
 
     if (!f)
     {
-        DList *empty = dlist_create(false, NULL);
+        DList *empty = dlist_create(true, NULL);
         return empty;
     }
 
-    DList *list = dlist_create(false, NULL);
+    DList *list = dlist_create(true, NULL);
     if (!list)
     {
         fclose(f);
@@ -71,7 +77,7 @@ DList *file_load_users(const char *path)
             User *first = malloc(sizeof *first);
             if (first && user_from_csv(first, line) == 0)
             {
-                dlist_push_back(list, first);
+                dlist_insert_priority(list, first, user_priority(first->id));
             }
             else if (first)
             {
@@ -97,7 +103,7 @@ DList *file_load_users(const char *path)
             continue;
         }
 
-        dlist_push_back(list, u);
+        dlist_insert_priority(list, u, user_priority(u->id));
     }
 
     fclose(f);

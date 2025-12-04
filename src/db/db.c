@@ -17,15 +17,26 @@
 #include "db/db.h"
 
 #include <stdlib.h>
+#include <limits.h>
 
 #include "fs/books_file.h"
 #include "fs/users_file.h"
 #include "fs/loans_file.h"
+#include "fs/suggestions_file.h"
 
 /* Small wrappers so dlist_destroy can free the stored elements. */
 static void free_book(void *p)  { free(p); }
 static void free_user(void *p)  { free(p); }
 static void free_loan(void *p)  { free(p); }
+static void free_suggestion(void *p) { free(p); }
+
+/* Traduz ids unsigned para prioridades int usadas pela DList. */
+static int id_priority(unsigned id)
+{
+	if (id >= (unsigned)INT_MAX)
+		return INT_MAX;
+	return (int)id;
+}
 
 /*
 	Loads all data from the filesystem layer into the DB.
@@ -37,7 +48,8 @@ static void free_loan(void *p)  { free(p); }
 int db_init(DB *db,
 			const char *books_path,
 			const char *users_path,
-			const char *loans_path)
+			const char *loans_path,
+			const char *suggestions_path)
 {
 	if (!db)
 		return -1;
@@ -45,8 +57,9 @@ int db_init(DB *db,
 	db->books = file_load_books(books_path);
 	db->users = file_load_users(users_path);
 	db->loans = file_load_loans(loans_path);
+	db->suggestions = file_load_suggestions(suggestions_path);
 
-	if (!db->books || !db->users || !db->loans)
+	if (!db->books || !db->users || !db->loans || !db->suggestions)
 	{
 		/* Clean up anything that was allocated before signaling failure. */
 		db_destroy(db);
@@ -64,7 +77,8 @@ int db_init(DB *db,
 int db_save(const DB *db,
 			const char *books_path,
 			const char *users_path,
-			const char *loans_path)
+			const char *loans_path,
+			const char *suggestions_path)
 {
 	if (!db)
 		return -1;
@@ -76,6 +90,8 @@ int db_save(const DB *db,
 	if (file_save_users(users_path, db->users) != 0)
 		ok = -1;
 	if (file_save_loans(loans_path, db->loans) != 0)
+		ok = -1;
+	if (file_save_suggestions(suggestions_path, db->suggestions) != 0)
 		ok = -1;
 
 	return ok;
@@ -96,10 +112,13 @@ void db_destroy(DB *db)
 		dlist_destroy(db->users, free_user);
 	if (db->loans)
 		dlist_destroy(db->loans, free_loan);
+	if (db->suggestions)
+		dlist_destroy(db->suggestions, free_suggestion);
 
 	db->books = NULL;
 	db->users = NULL;
 	db->loans = NULL;
+	db->suggestions = NULL;
 }
 
 /*
@@ -153,6 +172,21 @@ Loan *db_find_loan_by_id(const DB *db, unsigned id)
 	return NULL;
 }
 
+Suggestion *db_find_suggestion_by_id(const DB *db, unsigned id)
+{
+	if (!db || !db->suggestions)
+		return NULL;
+
+	DLIST_FOREACH(db->suggestions, node)
+	{
+		Suggestion *s = (Suggestion *)node->data;
+		if (s->id == id)
+			return s;
+	}
+
+	return NULL;
+}
+
 /* Simple accessors so UI code can iterate over lists. */
 
 DList *db_get_books(const DB *db)
@@ -168,6 +202,11 @@ DList *db_get_users(const DB *db)
 DList *db_get_loans(const DB *db)
 {
 	return db ? db->loans : NULL;
+}
+
+DList *db_get_suggestions(const DB *db)
+{
+	return db ? db->suggestions : NULL;
 }
 
 /*
@@ -193,7 +232,7 @@ int db_add_book(DB *db, const Book *src)
 
 	*b = *src;
 
-	dlist_push_back(db->books, b);
+	dlist_insert_priority(db->books, b, id_priority(b->id));
 	return 0;
 }
 
@@ -208,7 +247,7 @@ int db_add_user(DB *db, const User *src)
 
 	*u = *src;
 
-	dlist_push_back(db->users, u);
+	dlist_insert_priority(db->users, u, id_priority(u->id));
 	return 0;
 }
 
@@ -223,7 +262,21 @@ int db_add_loan(DB *db, const Loan *src)
 
 	*l = *src;
 
-	dlist_push_back(db->loans, l);
+	dlist_insert_priority(db->loans, l, id_priority(l->id));
+	return 0;
+}
+
+int db_add_suggestion(DB *db, const Suggestion *src)
+{
+	if (!db || !db->suggestions || !src)
+		return -1;
+
+	Suggestion *s = malloc(sizeof *s);
+	if (!s)
+		return -1;
+
+	*s = *src;
+	dlist_insert_priority(db->suggestions, s, id_priority(s->id));
 	return 0;
 }
 
@@ -279,6 +332,12 @@ static unsigned get_loan_id(const void *p)
 	return l->id;
 }
 
+static unsigned get_suggestion_id(const void *p)
+{
+	const Suggestion *s = (const Suggestion *)p;
+	return s->id;
+}
+
 int db_remove_book(DB *db, unsigned id)
 {
 	if (!db || !db->books)
@@ -301,5 +360,13 @@ int db_remove_loan(DB *db, unsigned id)
 		return -1;
 
 	return db_remove_from_list(db->loans, id, get_loan_id);
+}
+
+int db_remove_suggestion(DB *db, unsigned id)
+{
+	if (!db || !db->suggestions)
+		return -1;
+
+	return db_remove_from_list(db->suggestions, id, get_suggestion_id);
 }
 

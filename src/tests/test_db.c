@@ -25,9 +25,10 @@ int main(void)
     const char *books_path = "data/books_test.txt";
     const char *users_path = "data/users_test.txt";
     const char *loans_path = "data/loans_test.txt";
+    const char *suggestions_path = "data/suggestions_test.txt";
 
     DB db;
-    if (db_init(&db, books_path, users_path, loans_path) != 0)
+    if (db_init(&db, books_path, users_path, loans_path, suggestions_path) != 0)
     {
         printf("db_init failed\n");
         return 1;
@@ -54,7 +55,7 @@ int main(void)
     print_db_summary(&db);
 
     /* Persist any changes back to disk */
-    if (db_save(&db, books_path, users_path, loans_path) != 0)
+    if (db_save(&db, books_path, users_path, loans_path, suggestions_path) != 0)
         printf("db_save reported an error.\n");
     else
         printf("db_save completed successfully.\n");
