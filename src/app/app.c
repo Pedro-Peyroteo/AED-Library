@@ -27,13 +27,13 @@ static int ensure_data_directory(void)
 {
 	const char *path = "data";
 
-#ifdef _WIN32
-	if (_mkdir(path) == 0)
-		return 0;
-#else
-	if (mkdir(path, 0777) == 0)
-		return 0;
-#endif
+	#ifdef _WIN32
+		if (_mkdir(path) == 0)
+			return 0;
+	#else
+		if (mkdir(path, 0777) == 0)
+			return 0;
+	#endif
 
 	if (errno == EEXIST)
 		return 0;

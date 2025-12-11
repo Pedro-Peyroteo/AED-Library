@@ -120,8 +120,56 @@ void menuLivros(DB *db)
 
 void menuEmprestimos(DB *db)
 {
-	printf("\n=== MENU EMPRESTIMOS ===\n");
-	loan_list_all(db);
+	int opcao;
+
+	do
+	{
+		printf("\n=== MENU EMPRESTIMOS ===\n");
+		printf("1. Registar emprestimo\n");
+		printf("2. Devolver livro\n");
+		printf("3. Pesquisar emprestimos\n");
+		printf("4. Listar emprestimos ativos\n");
+		printf("5. Listar historico de emprestimos\n");
+		printf("6. Listar todos os emprestimos\n");
+		printf("0. Voltar ao menu principal\n");
+		printf("Escolha uma opcao: ");
+
+		if (scanf("%d", &opcao) != 1)
+		{
+			printf("Opcao invalida.\n");
+			opcao = -1;
+		}
+		while (getchar() != '\n')
+			;
+
+		switch (opcao)
+		{
+		case 1:
+			loan_create(db);
+			break;
+		case 2:
+			loan_return_book(db);
+			break;
+		case 3:
+			loan_search(db);
+			break;
+		case 4:
+			loan_list_active(db);
+			break;
+		case 5:
+			loan_list_history(db);
+			break;
+		case 6:
+			loan_list_all(db);
+			break;
+		case 0:
+			printf("A sair do menu de emprestimos.\n");
+			break;
+		default:
+			printf("Opcao invalida. Tente novamente.\n");
+			break;
+		}
+	} while (opcao != 0);
 }
 
 void menuSugestoes(DB *db)
