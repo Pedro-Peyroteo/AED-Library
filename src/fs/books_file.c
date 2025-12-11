@@ -130,7 +130,7 @@ DList *file_load_books(const char *path)
 	Writes all books from the given list to a CSV text file.
 
 	The function always overwrites the target file and writes:
-		- a header line: "id;title;author;year;available"
+		- a header line: "id;title;author;year;edition;available"
 		- one CSV line per Book in the list.
 
 	Return value:
@@ -146,7 +146,7 @@ int file_save_books(const char *path, const DList *books)
 	char buffer[BOOK_LINE_MAX];
 
 	/* Write header */
-	fprintf(f, "id;title;author;year;available\n");
+	fprintf(f, "id;title;author;year;edition;available\n");
 
 	DLIST_FOREACH(books, node)
 	{

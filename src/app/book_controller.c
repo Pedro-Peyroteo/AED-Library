@@ -105,8 +105,8 @@ void book_list_all(const DB *db)
     DLIST_FOREACH(books, node)
     {
         Book *b = (Book *)node->data;
-        printf("  id=%u, titulo=%s, autor=%s, ano=%d, disponivel=%d\n",
-               b->id, b->title, b->author, b->year, b->available);
+        printf("  id=%u, titulo=%s, autor=%s, ano=%d, edicao=%s, disponivel=%d\n",
+               b->id, b->title, b->author, b->year, b->edition, b->available);
     }
 }
 
@@ -120,6 +120,7 @@ void book_insert(DB *db)
 
     char title[128];
     char author[128];
+    char edition[32];
     int year;
     int stock;
 
@@ -146,6 +147,11 @@ void book_insert(DB *db)
     }
     clear_input_buffer();
 
+    printf("Edicao (enter para omitir): ");
+    if (!fgets(edition, sizeof edition, stdin))
+        return;
+    remove_newline(edition);
+
     printf("Numero de exemplares disponiveis: ");
     if (scanf("%d", &stock) != 1)
     {
@@ -156,7 +162,7 @@ void book_insert(DB *db)
     clear_input_buffer();
 
     Book temp_book;
-    book_init(&temp_book, new_id, title, author, year, stock);
+    book_init(&temp_book, new_id, title, author, year, edition, stock);
 
     if (db_add_book(db, &temp_book) == 0)
         printf("[book] Livro '%s' (ID=%u) inserido com sucesso.\n", temp_book.title, new_id);
@@ -190,12 +196,13 @@ void book_edit(DB *db)
         return;
     }
 
-    printf("Livro atual: id=%u, titulo=%s, autor=%s, ano=%d, disponivel=%d\n",
+    printf("Livro atual: id=%u, titulo=%s, autor=%s, ano=%d, edicao=%s, disponivel=%d\n",
            book_to_edit->id, book_to_edit->title, book_to_edit->author,
-           book_to_edit->year, book_to_edit->available);
+           book_to_edit->year, book_to_edit->edition, book_to_edit->available);
 
     char new_title[128];
     char new_author[128];
+    char new_edition[32];
     int new_year;
     int new_stock;
 
@@ -225,6 +232,17 @@ void book_edit(DB *db)
     if (scanf("%d", &new_year) == 1)
         book_to_edit->year = new_year;
     clear_input_buffer();
+
+    printf("Nova edicao (enter para manter): ");
+    if (fgets(new_edition, sizeof new_edition, stdin))
+    {
+        remove_newline(new_edition);
+        if (strlen(new_edition) > 0)
+        {
+            strncpy(book_to_edit->edition, new_edition, sizeof(book_to_edit->edition) - 1);
+            book_to_edit->edition[sizeof(book_to_edit->edition) - 1] = '\0';
+        }
+    }
 
     printf("Novo stock (atual %d): ", book_to_edit->available);
     if (scanf("%d", &new_stock) == 1)
@@ -346,8 +364,8 @@ void book_search(DB *db)
 
         if (match)
         {
-            printf("  id=%u, titulo=%s, autor=%s, ano=%d, disponivel=%d\n",
-                   b->id, b->title, b->author, b->year, b->available);
+            printf("  id=%u, titulo=%s, autor=%s, ano=%d, edicao=%s, disponivel=%d\n",
+                   b->id, b->title, b->author, b->year, b->edition, b->available);
             ++count;
 
             if (opcao == 1)
@@ -395,6 +413,7 @@ void book_duplicate(DB *db)
               original->title,
               original->author,
               original->year,
+              original->edition,
               original->available);
 
     if (db_add_book(db, &duplicate) == 0)
